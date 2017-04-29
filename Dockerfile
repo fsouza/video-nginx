@@ -16,4 +16,5 @@ FROM alpine:3.5
 RUN apk add --no-cache ca-certificates openssl pcre zlib
 COPY --from=build /usr/local/nginx /usr/local/nginx
 COPY nginx.conf /usr/local/nginx/conf/nginx.conf
+RUN rm -rf /usr/local/nginx/html /usr/loca/nginx/conf/*.default
 ENTRYPOINT ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
