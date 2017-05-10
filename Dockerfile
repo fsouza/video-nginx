@@ -1,17 +1,25 @@
 FROM alpine:3.5 as build
 
-RUN apk add --no-cache curl build-base openssl openssl-dev zlib-dev linux-headers pcre-dev luajit luajit-dev
-RUN mkdir nginx nginx-vod-module nginx-lua-module ngx_devel_kit
+RUN apk add --no-cache curl build-base openssl openssl-dev zlib-dev linux-headers pcre-dev luajit luajit-dev ffmpeg ffmpeg-dev libjpeg-turbo libjpeg-turbo-dev
+RUN mkdir nginx nginx-vod-module nginx-lua-module ngx_devel_kit nginx-rtmp-module nginx-thumb-module
 
 ENV NGINX_VERSION 1.11.10
 ENV VOD_MODULE_VERSION 1.16
-ENV LUA_MODULE_VERSION 0.10.8
-ENV DEV_MODULE_VERSION 0.3.0
+ENV LUA_MODULE_VERSION v0.10.8
+ENV DEV_MODULE_VERSION v0.3.0
+ENV RTMP_MODULE_VERSION v1.1.11
+ENV THUMB_MODULE_VERSION 0.8.0
 
 RUN curl -sL https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar -C nginx --strip 1 -xz
 RUN curl -sL https://github.com/kaltura/nginx-vod-module/archive/${VOD_MODULE_VERSION}.tar.gz | tar -C nginx-vod-module --strip 1 -xz
-RUN curl -sL https://github.com/openresty/lua-nginx-module/archive/v${LUA_MODULE_VERSION}.tar.gz | tar -C nginx-lua-module --strip 1 -xz
-RUN curl -sL https://github.com/simpl/ngx_devel_kit/archive/v${DEV_MODULE_VERSION}.tar.gz | tar -C ngx_devel_kit --strip 1 -xz
+RUN curl -sL https://github.com/openresty/lua-nginx-module/archive/${LUA_MODULE_VERSION}.tar.gz | tar -C nginx-lua-module --strip 1 -xz
+RUN curl -sL https://github.com/simpl/ngx_devel_kit/archive/${DEV_MODULE_VERSION}.tar.gz | tar -C ngx_devel_kit --strip 1 -xz
+RUN curl -sL https://github.com/arut/nginx-rtmp-module/archive/${RTMP_MODULE_VERSION}.tar.gz | tar -C nginx-rtmp-module --strip 1 -xz
+
+# Temporarily using a fork of nginx-video-thumbextractor-module, see
+# https://github.com/wandenberg/nginx-video-thumbextractor-module/pull/11
+# RUN curl -sL https://github.com/wandenberg/nginx-video-thumbextractor-module/archive/${THUMB_MODULE_VERSION}.tar.gz | tar -C nginx-thumb-module --strip 1 -xz
+RUN curl -sL https://github.com/fsouza/nginx-video-thumbextractor-module/archive/master.tar.gz | tar -C nginx-thumb-module --strip 1 -xz
 
 ENV LUAJIT_INC /usr/include/luajit-2.1/
 ENV LUAJIT_LIB /usr/lib
@@ -22,14 +30,17 @@ RUN ./configure --prefix=/usr/local/nginx \
 	--add-module=../nginx-vod-module \
 	--add-module=../ngx_devel_kit \
 	--add-module=../nginx-lua-module \
+	--add-module=../nginx-thumb-module \
+	--add-module=../nginx-rtmp-module \
 	--with-file-aio \
 	--with-cc-opt="-O3"
 RUN make
 RUN make install
 
 FROM alpine:3.5
-RUN apk add --no-cache ca-certificates openssl pcre zlib luajit
+RUN apk add --no-cache ca-certificates openssl pcre zlib luajit ffmpeg libjpeg-turbo
 COPY --from=build /usr/local/nginx /usr/local/nginx
 COPY nginx.conf /usr/local/nginx/conf/nginx.conf
 RUN rm -rf /usr/local/nginx/html /usr/loca/nginx/conf/*.default
-ENTRYPOINT ["/usr/local/nginx/sbin/nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/usr/local/nginx/sbin/nginx"]
+CMD ["-g", "daemon off;"]
