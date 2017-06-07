@@ -13,7 +13,7 @@ video-delivery. It contains:
 - [nginx-vod-module](https://github.com/kaltura/nginx-vod-module) for
   on-the-fly video segmenting
 
-Please notice that in order to build this locally you need Docker CE 17.05.
+Please notice that in order to build this locally you need Docker 17.05.
 
 The image is available on Docker Hub:
 https://hub.docker.com/r/fsouza/video-nginx/.
