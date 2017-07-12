@@ -29,6 +29,7 @@ RUN ./configure --prefix=/usr/local/nginx \
 	--add-module=../nginx-thumb-module \
 	--add-module=../nginx-rtmp-module \
 	--with-file-aio \
+	--with-threads \
 	--with-cc-opt="-O3"
 RUN make
 RUN make install
