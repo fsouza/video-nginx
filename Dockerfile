@@ -3,7 +3,7 @@ FROM alpine:3.8 as build
 RUN apk add --no-cache curl build-base openssl openssl-dev zlib-dev linux-headers pcre-dev luajit luajit-dev ffmpeg ffmpeg-dev libjpeg-turbo libjpeg-turbo-dev
 RUN mkdir nginx nginx-vod-module nginx-lua-module ngx_devel_kit nginx-rtmp-module nginx-thumb-module
 
-ENV NGINX_VERSION 1.14.0
+ENV NGINX_VERSION 1.14.2
 ENV VOD_MODULE_VERSION 1.23
 ENV LUA_MODULE_VERSION v0.10.13
 ENV DEV_MODULE_VERSION v0.3.0
@@ -20,7 +20,7 @@ RUN curl -sL https://github.com/wandenberg/nginx-video-thumbextractor-module/arc
 ENV LUAJIT_INC /usr/include/luajit-2.1/
 ENV LUAJIT_LIB /usr/lib
 
-WORKDIR nginx
+WORKDIR /nginx
 RUN ./configure --prefix=/usr/local/nginx \
 	--with-ld-opt="-Wl,-rpath,/usr/lib/libluajit-5.1.so" \
 	--add-module=../nginx-vod-module \
