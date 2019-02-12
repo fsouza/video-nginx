@@ -1,4 +1,4 @@
-FROM alpine:3.8 as build
+FROM alpine:3.9 as build
 
 RUN apk add --no-cache curl build-base openssl openssl-dev zlib-dev linux-headers pcre-dev luajit luajit-dev ffmpeg ffmpeg-dev libjpeg-turbo libjpeg-turbo-dev
 RUN mkdir nginx nginx-vod-module nginx-lua-module ngx_devel_kit nginx-rtmp-module nginx-thumb-module
@@ -34,7 +34,7 @@ RUN ./configure --prefix=/usr/local/nginx \
 RUN make
 RUN make install
 
-FROM alpine:3.8
+FROM alpine:3.9
 RUN apk add --no-cache ca-certificates openssl pcre zlib luajit ffmpeg libjpeg-turbo
 COPY --from=build /usr/local/nginx /usr/local/nginx
 COPY nginx.conf /usr/local/nginx/conf/nginx.conf
