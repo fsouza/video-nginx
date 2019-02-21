@@ -4,7 +4,7 @@ RUN apk add --no-cache curl build-base openssl openssl-dev zlib-dev linux-header
 RUN mkdir nginx nginx-vod-module nginx-lua-module ngx_devel_kit nginx-rtmp-module nginx-thumb-module
 
 ENV NGINX_VERSION 1.14.2
-ENV VOD_MODULE_VERSION 1.23
+ENV VOD_MODULE_VERSION 1.24
 ENV LUA_MODULE_VERSION v0.10.13
 ENV DEV_MODULE_VERSION v0.3.0
 ENV RTMP_MODULE_VERSION v1.2.1
